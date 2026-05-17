@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Usuario</title>
+</head>
+<body>
+
+<h2>Registro de Usuario</h2>
+
+<div id="errorMsg" style="color:red;"></div>
+<div id="exitoMsg" style="color:green;"></div>
+
+<form id="registroForm">
+  <label>Nombre:</label><br>
+  <input type="text" id="nombre" required><br><br>
+
+  <label>Correo electrónico:</label><br>
+  <input type="email" id="email" required><br><br>
+
+  <label>Contraseña:</label><br>
+  <input type="password" id="password" required><br><br>
+
+  <button type="submit">Registrarse</button>
+</form>
+
+<br>
+<a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
+
+<script>
+  document.getElementById('registroForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nombre = document.getElementById('nombre').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+          const response = await fetch('/api/usuarios/registrar', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                  nombre: nombre,
+                  email: email,
+                  password: password
+              })
+          });
+          const data = await response.json();
+
+          if (data.success) {
+              document.getElementById('exitoMsg').textContent = 'Registro exitoso. Redirigiendo al login...';
+              setTimeout(() => {
+                  window.location.href = '/login';
+              }, 2000);
+          } else {
+              document.getElementById('errorMsg').textContent = data.mensaje;
+          }
+      } catch (error) {
+          document.getElementById('errorMsg').textContent = 'Error al conectar con el servidor';
+      }
+  });
+</script>
+
+</body>
+</html>

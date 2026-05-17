@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Mi lista de deseos</title>
+</head>
+<body>
+
+<div th:replace="~{navbar :: navbar}"></div>
+
+<h2>⭐ Libros que quieres prestar después</h2>
+
+<div id="listaContainer"></div>
+
+<script>
+  const usuarioId = localStorage.getItem('usuarioId');
+
+  if (!usuarioId) {
+      window.location.href = '/login';
+  }
+
+  async function cargarListaDeseos() {
+      try {
+          const response = await fetch(`/api/listadeseos/${usuarioId}`);
+          const lista = await response.json();
+
+          const container = document.getElementById('listaContainer');
+          container.innerHTML = '';
+
+          if (lista.length === 0) {
+              container.innerHTML = '<p>No tienes libros en tu lista de deseos.</p>';
+              return;
+          }
+
+          for (const item of lista) {
+              const libro = item.libro;
+              const card = document.createElement('div');
+              card.style.border = '1px solid #ccc';
+              card.style.margin = '10px';
+              card.style.padding = '10px';
+
+              let fecha = item.fechaAgregado ? item.fechaAgregado.substring(0, 10) : 'Desconocida';
+
+              card.innerHTML = `
+                  <strong>${libro.titulo}</strong><br>
+                  Autor: ${libro.autor}<br>
+                  Tipo: ${libro.tipo}<br>
+                  Agregado: ${fecha}<br><br>
+                  <button onclick="verDetalles(${libro.id})">Ver detalles</button>
+              `;
+              container.appendChild(card);
+          }
+      } catch (error) {
+          console.error('Error:', error);
+          document.getElementById('listaContainer').innerHTML = 'Error al cargar lista de deseos';
+      }
+  }
+
+  function verDetalles(id) {
+      window.location.href = `/detalles-libro?id=${id}`;
+  }
+
+  cargarListaDeseos();
+</script>
+
+</body>
+</html>

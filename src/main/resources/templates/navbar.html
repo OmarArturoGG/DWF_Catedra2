@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="navbar">
+  <table width="100%" bgcolor="#f0f0f0">
+    <tr>
+      <td align="center">
+        <a href="/menu">🏠 Inicio</a> &nbsp;|&nbsp;
+        <a href="/prestamos">📖 Préstamos</a> &nbsp;|&nbsp;
+
+        <a href="/activos">✅ Activos</a> &nbsp;|&nbsp;
+        <a href="/lista-deseos">⭐ Lista de deseos</a> &nbsp;|&nbsp;
+        <a href="/mi-cuenta">👤 Mi cuenta</a> &nbsp;|&nbsp;
+        <a href="/login" onclick="localStorage.clear()">🚪 Cerrar sesión</a>
+      </td>
+    </tr>
+  </table>
+  <br>
+</div>
+</body>
+</html>

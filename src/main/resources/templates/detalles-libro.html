@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Detalles del libro</title>
+</head>
+<body>
+
+<div th:replace="~{navbar :: navbar}"></div>
+
+<h2>📖 Detalles del libro</h2>
+
+<div id="detallesContainer"></div>
+
+<script>
+  const usuarioId = localStorage.getItem('usuarioId');
+  const urlParams = new URLSearchParams(window.location.search);
+  const libroId = urlParams.get('id');
+
+  if (!usuarioId) {
+      window.location.href = '/login';
+  }
+
+  async function cargarDetalles() {
+      try {
+          const response = await fetch(`/api/libros/${libroId}`);
+          const libro = await response.json();
+
+          const container = document.getElementById('detallesContainer');
+
+          let imagen = '';
+          if (libro.portadaUrl) {
+              imagen = `<img src="${libro.portadaUrl}" width="150" height="200"><br><br>`;
+          }
+
+          let prestarBoton = '';
+          if (libro.tipo === 'FISICO') {
+              prestarBoton = `
+                  <h3>📚 Prestar libro físico</h3>
+                  <label>Días de préstamo:</label>
+                  <input type="number" id="dias" value="7" min="1" max="30">
+                  <button onclick="prestarLibro()">Prestar</button>
+                  <div id="prestarMsg"></div>
+              `;
+          } else {
+              if (libro.pdfUrl) {
+                  prestarBoton = `
+                      <h3>📖 Libro virtual</h3>
+                      <p>✅ Este libro tiene PDF disponible para leer.</p>
+                      <button onclick="leerPDF()" style="background-color:#4CAF50;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;">📖 Leer libro completo</button>
+                      <div id="leerMsg"></div>
+                  `;
+              } else {
+                  prestarBoton = `
+                      <h3>📖 Libro virtual</h3>
+                      <p>⚠️ Este libro no tiene PDF disponible aún.</p>
+                  `;
+              }
+          }
+
+          container.innerHTML = `
+              ${imagen}
+              <p><strong>Título:</strong> ${libro.titulo}</p>
+              <p><strong>Autor:</strong> ${libro.autor}</p>
+              <p><strong>Fecha publicación:</strong> ${libro.fechaPublicacion || 'No especificada'}</p>
+              <p><strong>Tipo:</strong> ${libro.tipo}</p>
+              <p><strong>Disponible:</strong> ${libro.disponible ? 'Sí' : 'No'}</p>
+              <p><strong>Descripción:</strong> ${libro.descripcion || 'Sin descripción'}</p>
+              ${prestarBoton}
+          `;
+
+      } catch (error) {
+          document.getElementById('detallesContainer').innerHTML = 'Error al cargar detalles del libro';
+      }
+  }
+
+  async function prestarLibro() {
+      const dias = document.getElementById('dias').value;
+      try {
+          const response = await fetch('/api/prestamos/prestar', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                  usuarioId: usuarioId,
+                  libroId: libroId,
+                  diasPrestamo: dias
+              })
+          });
+          const data = await response.json();
+
+          if (data.success) {
+              document.getElementById('prestarMsg').innerHTML = '<p style="color:green;">✅ Préstamo realizado con éxito. Redirigiendo...</p>';
+              setTimeout(() => {
+                  window.location.href = '/activos';
+              }, 2000);
+          } else {
+              document.getElementById('prestarMsg').innerHTML = '<p style="color:red;">❌ Error: ' + data.mensaje + '</p>';
+          }
+      } catch (error) {
+          console.error('Error:', error);
+          document.getElementById('prestarMsg').innerHTML = '<p style="color:red;">Error al realizar préstamo</p>';
+      }
+  }
+
+  function leerPDF() {
+      window.open(`/leer-pdf?id=${libroId}`, '_blank');
+  }
+
+  cargarDetalles();
+</script>
+
+</body>
+</html>

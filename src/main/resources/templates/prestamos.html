@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Libros para préstamo</title>
+</head>
+<body>
+
+<div th:replace="~{navbar :: navbar}"></div>
+
+<h2> Libros disponibles para préstamo</h2>
+
+<div id="librosContainer"></div>
+
+<script>
+  const usuarioId = localStorage.getItem('usuarioId');
+
+  if (!usuarioId) {
+      window.location.href = '/login';
+  }
+
+  async function cargarLibros() {
+      try {
+          const response = await fetch('/api/libros/disponibles');
+          const libros = await response.json();
+
+          const container = document.getElementById('librosContainer');
+          container.innerHTML = '';
+
+          for (const libro of libros) {
+              const card = document.createElement('div');
+              card.style.border = '1px solid #ccc';
+              card.style.margin = '10px';
+              card.style.padding = '10px';
+              card.style.display = 'inline-block';
+              card.style.width = '250px';
+
+              let imagen = '';
+              if (libro.portadaUrl) {
+                  imagen = `<img src="${libro.portadaUrl}" width="100" height="150"><br>`;
+              } else {
+                  imagen = `<div style="width:100px;height:150px;background:#ddd;">Sin imagen</div><br>`;
+              }
+
+              card.innerHTML = `
+                  ${imagen}
+                  <strong>${libro.titulo}</strong><br>
+                  Autor: ${libro.autor}<br>
+                  Tipo: ${libro.tipo}<br><br>
+                  <button onclick="verDetalles(${libro.id})">Ver detalles</button>
+                  <button onclick="agregarAListaDeseos(${libro.id})">⭐</button>
+              `;
+              container.appendChild(card);
+          }
+      } catch (error) {
+          document.getElementById('librosContainer').innerHTML = 'Error al cargar libros';
+      }
+  }
+
+  function verDetalles(id) {
+      window.location.href = `/detalles-libro?id=${id}`;
+  }
+
+  async function agregarAListaDeseos(libroId) {
+      try {
+          const response = await fetch('/api/listadeseos/agregar', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                  usuarioId: usuarioId,
+                  libroId: libroId
+              })
+          });
+          const data = await response.json();
+          if (data.success) {
+              alert('Libro agregado a lista de deseos');
+          } else {
+              alert(' Error: ' + data.mensaje);
+          }
+      } catch (error) {
+          console.error('Error:', error);
+          alert('Error al agregar a lista de deseos');
+      }
+  }
+
+  cargarLibros();
+</script>
+
+</body>
+</html>

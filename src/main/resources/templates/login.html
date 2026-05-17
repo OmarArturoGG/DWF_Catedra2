@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Iniciar Sesión</title>
+</head>
+<body>
+<div class="container">
+  <h2>Iniciar Sesión</h2>
+  <div id="errorMsg" class="error"></div>
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="Correo electrónico" required>
+    <input type="password" id="password" placeholder="Contraseña" required>
+    <button type="submit">Ingresar</button>
+  </form>
+  <div class="registro">
+    <a href="/registro">¿No tienes cuenta? Regístrate</a>
+  </div>
+</div>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+          const response = await fetch('/api/usuarios/login', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                  email: email,
+                  password: password
+              })
+          });
+          const data = await response.json();
+
+          if (data.success) {
+              localStorage.setItem('usuarioId', data.usuarioId);
+              localStorage.setItem('usuarioNombre', data.usuarioNombre);
+              window.location.href = '/menu';
+          } else {
+              document.getElementById('errorMsg').textContent = data.mensaje;
+          }
+      } catch (error) {
+          document.getElementById('errorMsg').textContent = 'Error al conectar con el servidor';
+      }
+  });
+</script>
+</body>
+</html>

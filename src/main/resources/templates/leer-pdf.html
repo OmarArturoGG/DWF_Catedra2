@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Leyendo libro</title>
+    <style>
+        body { margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; }
+        .toolbar { background-color: #333; color: white; padding: 10px; text-align: center; }
+        .toolbar a { color: white; text-decoration: none; }
+        iframe { width: 100%; flex: 1; border: none; }
+    </style>
+</head>
+<body>
+<div class="toolbar">
+    <a href="/menu">← Volver al menú</a>
+</div>
+<iframe id="pdfViewer"></iframe>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const libroId = urlParams.get('id');
+    async function cargarPDF() {
+        try {
+            const response = await fetch(`/api/libros/${libroId}`);
+            const libro = await response.json();
+            document.title = `Leyendo: ${libro.titulo}`;
+            if (libro.pdfUrl) {
+                document.getElementById('pdfViewer').src = libro.pdfUrl;
+            } else {
+                document.getElementById('pdfViewer').srcdoc = '<html><body><h2>No hay PDF disponible</h2></body></html>';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    cargarPDF();
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Menú Principal</title>
+</head>
+<body>
+
+<h1>Biblioteca Digital</h1>
+<p>Bienvenido, <span id="nombreUsuario"></span></p>
+
+<hr>
+
+<ul>
+  <li><a href="/prestamos">📖 Préstamo (Libros disponibles)</a></li>
+  <li><a href="/activos">✅ Mis préstamos activos</a></li>
+  <li><a href="/lista-deseos">⭐ Mi lista de deseos</a></li>
+</ul>
+
+<br>
+<a href="/login">Cerrar sesión</a>
+
+<script>
+  const nombre = localStorage.getItem('usuarioNombre');
+  if (nombre) {
+      document.getElementById('nombreUsuario').textContent = nombre;
+  } else {
+      window.location.href = '/login';
+  }
+</script>
+
+</body>
+</html>

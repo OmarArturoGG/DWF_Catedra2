@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Mis préstamos activos</title>
+</head>
+<body>
+
+<div th:replace="~{navbar :: navbar}"></div>
+
+<h2>✅ Libros que tienes prestados actualmente</h2>
+
+<div id="prestamosContainer"></div>
+
+<script>
+  const usuarioId = localStorage.getItem('usuarioId');
+
+  if (!usuarioId) {
+      window.location.href = '/login';
+  }
+
+  async function cargarPrestamosActivos() {
+      try {
+          const response = await fetch(`/api/prestamos/activos/${usuarioId}`);
+          const prestamos = await response.json();
+
+          const container = document.getElementById('prestamosContainer');
+          container.innerHTML = '';
+
+          if (prestamos.length === 0) {
+              container.innerHTML = '<p>No tienes préstamos activos.</p>';
+              return;
+          }
+
+          for (const prestamo of prestamos) {
+              const libro = prestamo.libro;
+              const card = document.createElement('div');
+              card.style.border = '1px solid #ccc';
+              card.style.margin = '10px';
+              card.style.padding = '10px';
+
+              card.innerHTML = `
+                  <strong>${libro.titulo}</strong><br>
+                  Autor: ${libro.autor}<br>
+                  Fecha préstamo: ${prestamo.fechaPrestamo}<br>
+                  Fecha límite: ${prestamo.fechaLimite}<br>
+                  Estado: ${prestamo.estado}
+              `;
+              container.appendChild(card);
+          }
+      } catch (error) {
+          document.getElementById('prestamosContainer').innerHTML = 'Error al cargar préstamos';
+      }
+  }
+
+  cargarPrestamosActivos();
+</script>
+
+</body>
+</html>
