@@ -17,20 +17,35 @@ public class prestamoService {
     private prestamoRepository prestamoRepository;
 
     public Prestamo prestarLibro(Usuario usuario, Libro libro, int diasPrestamo) {
+
+        if(usuario == null){
+            throw new RuntimeException("El usuario no existe");
+        }
+
+        if(libro == null){
+            throw new RuntimeException("El libro no existe");
+        }
+
+        if(!libro.isDisponible()){
+            throw new RuntimeException("El libro no está disponible");
+        }
+
+        if(diasPrestamo <= 0){
+            throw new RuntimeException("Los días de préstamo son inválidos");
+        }
+
         Prestamo prestamo = new Prestamo();
+
         prestamo.setUsuario(usuario);
         prestamo.setLibro(libro);
+
         prestamo.setFechaPrestamo(LocalDateTime.now());
         prestamo.setFechaLimite(LocalDateTime.now().plusDays(diasPrestamo));
+
         prestamo.setEstado("ACTIVO");
+
+        libro.setDisponible(false);
+
         return prestamoRepository.save(prestamo);
-    }
-
-    public List<Prestamo> listarPrestamosActivosPorUsuario(Usuario usuario) {
-        return prestamoRepository.findByUsuarioAndEstado(usuario, "ACTIVO");
-    }
-
-    public List<Prestamo> listarTodosLosPrestamosPorUsuario(Usuario usuario) {
-        return prestamoRepository.findByUsuario(usuario);
     }
 }

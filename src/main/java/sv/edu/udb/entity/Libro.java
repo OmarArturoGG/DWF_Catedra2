@@ -1,5 +1,6 @@
 package sv.edu.udb.entity;
 
+import io.netty.util.AsciiString;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -60,4 +61,13 @@ public class Libro {
     @JsonIgnore
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ListaDeseos> listaDeseos = new ArrayList<>();
+
+    public AsciiString getImagenUrl() {
+        return null;
+    }
+
+    public boolean isDisponible() {
+
+        return false;
+    }
 }

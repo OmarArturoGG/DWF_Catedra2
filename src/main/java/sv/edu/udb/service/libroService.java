@@ -30,6 +30,27 @@ public class libroService {
     }
 
     public Libro guardarLibro(Libro libro) {
+
+        if(libro.getTitulo() == null || libro.getTitulo().trim().isEmpty()){
+            throw new RuntimeException("El título del libro está vacío");
+        }
+
+        if(libro.getAutor() == null || libro.getAutor().trim().isEmpty()){
+            throw new RuntimeException("El autor está vacío");
+        }
+
+        if(libro.getTipo() == null || libro.getTipo().trim().isEmpty()){
+            throw new RuntimeException("El tipo de libro está vacío");
+        }
+
+        if(libro.getDescripcion() == null || libro.getDescripcion().trim().isEmpty()){
+            throw new RuntimeException("La descripción está vacía");
+        }
+
+        if(libro.getImagenUrl() == null || libro.getImagenUrl().trim().isEmpty()){
+            throw new RuntimeException("La imagen del libro está vacía");
+        }
+
         return libroRepository.save(libro);
     }
 }
