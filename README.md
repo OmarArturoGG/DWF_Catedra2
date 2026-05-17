@@ -12,8 +12,8 @@
     <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif"><br><br>
 
 <pre>
- Nuestra Apliación se trata sobre el prestamo de libros de una Biblioteca
- para este proyecto lo hemos desarrollado con el lenguaje de Java con ayuda del Framework de Spring bot
+ 📖Nuestra Apliación se trata sobre el prestamo de libros de una Biblioteca
+ 📖para este proyecto lo hemos desarrollado con el lenguaje de Java con ayuda del Framework de Spring bot
 
 </pre>
 <hr>
