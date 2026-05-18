@@ -74,12 +74,12 @@ public class vistaController {
                                  @RequestParam(required = false) String codigoAdmin,
                                  RedirectAttributes ra) {
         try {
-            String rol = "USER";
-            if ("ADMIN".equalsIgnoreCase(tipoUsuario)) {
+            String rol = "voluntario";
+            if ("admin".equalsIgnoreCase(tipoUsuario)) {
                 if (codigoAdmin == null || !codigoAdmin.equals(adminCode)) {
                     throw new BusinessException("Codigo de administrador invalido");
                 }
-                rol = "ADMIN";
+                rol = "admin";
             }
             usuarioService.registrarUsuario(nombre, email, password, rol);
             ra.addFlashAttribute("ok", "Cuenta creada. Ahora inicia sesion.");
@@ -103,9 +103,9 @@ public class vistaController {
                 .orElseThrow(() -> new BusinessException("Usuario no encontrado"));
         session.setAttribute("usuarioId", usuario.getId());
         session.setAttribute("usuarioNombre", usuario.getNombre());
-        String rol = usuario.getRol() == null ? "USER" : usuario.getRol();
+        String rol = usuario.getRol() == null ? "USER" : usuario.getRol().toString();
         session.setAttribute("usuarioRol", rol);
-        return "ADMIN".equalsIgnoreCase(rol) ? "redirect:/admin" : "redirect:/usuario";
+        return "admin".equalsIgnoreCase(rol) ? "redirect:/admin" : "redirect:/usuario";
     }
 
     @PostMapping("/logout")
@@ -419,7 +419,7 @@ public class vistaController {
 
     private boolean isAdmin(HttpSession session) {
         Object rol = session.getAttribute("usuarioRol");
-        return rol != null && "ADMIN".equalsIgnoreCase(rol.toString());
+        return rol != null && "admin".equalsIgnoreCase(rol.toString());
     }
 
     private LibroRequest buildLibroRequest(String titulo,

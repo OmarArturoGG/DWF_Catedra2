@@ -10,10 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sv.edu.udb.entity.Libro;
-import sv.edu.udb.entity.ListaDeseos;
-import sv.edu.udb.entity.Prestamo;
-import sv.edu.udb.entity.Usuario;
+import sv.edu.udb.entity.*;
 import sv.edu.udb.repository.libroRepository;
 import sv.edu.udb.repository.listaDeseosRepository;
 import sv.edu.udb.repository.prestamoRepository;
@@ -60,7 +57,7 @@ class PrestamoYListaDeseosIntegrationTest {
         usuario.setNombre("Usuario Test");
         usuario.setEmail("test@udb.edu.sv");
         usuario.setPassword("hash");
-        usuario.setRol("USER");
+        usuario.setRol(Rol.voluntario);
         usuario.setFechaRegistro(LocalDateTime.now());
         usuario = usuarioRepository.save(usuario);
 

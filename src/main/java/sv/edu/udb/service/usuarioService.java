@@ -3,6 +3,7 @@ package sv.edu.udb.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import sv.edu.udb.entity.Rol;
 import sv.edu.udb.entity.Usuario;
 import sv.edu.udb.exception.BusinessException;
 import sv.edu.udb.exception.DuplicateResourceException;
@@ -54,7 +55,7 @@ public class usuarioService {
         usuario.setEmail(email);
         usuario.setPassword(passwordEncoder.encode(password));
         usuario.setFechaRegistro(LocalDateTime.now());
-        usuario.setRol(("ADMIN".equalsIgnoreCase(rol)) ? "ADMIN" : "USER");
+        usuario.setRol(("admin".equalsIgnoreCase(rol)) ? Rol.admin : Rol.voluntario);
         return usuarioRepository.save(usuario);
     }
 
