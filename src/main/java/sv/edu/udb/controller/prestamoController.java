@@ -1,16 +1,17 @@
 package sv.edu.udb.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import sv.edu.udb.entity.Libro;
 import sv.edu.udb.entity.Prestamo;
 import sv.edu.udb.entity.Usuario;
-import sv.edu.udb.entity.Libro;
+import sv.edu.udb.service.libroService;
 import sv.edu.udb.service.prestamoService;
 import sv.edu.udb.service.usuarioService;
-import sv.edu.udb.service.libroService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/prestamos")
@@ -25,43 +26,56 @@ public class prestamoController {
     @Autowired
     private libroService libroService;
 
-    @PostMapping("/prestar")
-    public Map<String, Object> prestarLibro(@RequestParam Long usuarioId,
-                                            @RequestParam Long libroId,
-                                            @RequestParam int diasPrestamo) {
-        Map<String, Object> respuesta = new HashMap<>();
-        try {
-            Usuario usuario = usuarioService.buscarPorId(usuarioId).orElse(null);
-            Libro libro = libroService.buscarPorId(libroId).orElse(null);
+    @GetMapping
+    public ResponseEntity<List<Prestamo>> listarTodos() {
+        return ResponseEntity.ok(prestamoService.listarTodos());
+    }
 
-            if (usuario == null || libro == null) {
-                respuesta.put("success", false);
-                respuesta.put("mensaje", "Usuario o libro no encontrado");
-                return respuesta;
-            }
+    @GetMapping("/{id}")
+    public ResponseEntity<Prestamo> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(prestamoService.obtenerPorId(id));
+    }
 
-            Prestamo prestamo = prestamoService.prestarLibro(usuario, libro, diasPrestamo);
-            respuesta.put("success", true);
-            respuesta.put("mensaje", "Préstamo realizado con éxito");
-            respuesta.put("prestamo", prestamo);
-        } catch (Exception e) {
-            respuesta.put("success", false);
-            respuesta.put("mensaje", "Error al prestar: " + e.getMessage());
-        }
-        return respuesta;
+    @PostMapping
+    public ResponseEntity<Prestamo> prestarLibro(@RequestParam Long usuarioId,
+                                                 @RequestParam Long libroId,
+                                                 @RequestParam int diasPrestamo) {
+        Usuario usuario = usuarioService.obtenerPorId(usuarioId);
+        Libro libro = libroService.obtenerPorId(libroId);
+        Prestamo prestamo = prestamoService.prestarLibro(usuario, libro, diasPrestamo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(prestamo);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Prestamo> actualizar(@PathVariable Long id, @RequestBody Prestamo prestamo) {
+        return ResponseEntity.ok(prestamoService.actualizarPrestamo(id, prestamo));
+    }
+
+    @PutMapping("/{id}/dias")
+    public ResponseEntity<Prestamo> actualizarDias(@PathVariable Long id, @RequestParam int dias) {
+        return ResponseEntity.ok(prestamoService.actualizarDiasPrestamo(id, dias));
+    }
+
+    @PutMapping("/{id}/devolver")
+    public ResponseEntity<Prestamo> devolver(@PathVariable Long id) {
+        return ResponseEntity.ok(prestamoService.devolverLibro(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        prestamoService.eliminarPrestamo(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/activos/{usuarioId}")
-    public List<Prestamo> prestamosActivos(@PathVariable Long usuarioId) {
-        Usuario usuario = usuarioService.buscarPorId(usuarioId).orElse(null);
-        if (usuario == null) return null;
-        return prestamoService.listarPrestamosActivosPorUsuario(usuario);
+    public ResponseEntity<List<Prestamo>> prestamosActivos(@PathVariable Long usuarioId) {
+        Usuario usuario = usuarioService.obtenerPorId(usuarioId);
+        return ResponseEntity.ok(prestamoService.listarPrestamosActivosPorUsuario(usuario));
     }
 
     @GetMapping("/historial/{usuarioId}")
-    public List<Prestamo> historialPrestamos(@PathVariable Long usuarioId) {
-        Usuario usuario = usuarioService.buscarPorId(usuarioId).orElse(null);
-        if (usuario == null) return null;
-        return prestamoService.listarTodosLosPrestamosPorUsuario(usuario);
+    public ResponseEntity<List<Prestamo>> historialPrestamos(@PathVariable Long usuarioId) {
+        Usuario usuario = usuarioService.obtenerPorId(usuarioId);
+        return ResponseEntity.ok(prestamoService.listarTodosLosPrestamosPorUsuario(usuario));
     }
 }
