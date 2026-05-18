@@ -11,4 +11,5 @@ import java.util.List;
 public interface prestamoRepository extends JpaRepository<Prestamo, Long> {
     List<Prestamo> findByUsuarioAndEstado(Usuario usuario, String estado);
     List<Prestamo> findByUsuario(Usuario usuario);
+    List<Prestamo> findByUsuarioId(Long usuarioId);
 }

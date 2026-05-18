@@ -40,4 +40,8 @@ public class usuarioService {
         usuario.setFechaRegistro(LocalDateTime.now());
         return usuarioRepository.save(usuario);
     }
+
+    public Optional<Usuario> buscarPorId(Long id) {
+        return usuarioRepository.findById(id);
+    }
 }
