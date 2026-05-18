@@ -27,14 +27,40 @@
                     <td th:text="${p.fechaLimite}"></td>
                     <td th:text="${p.estado}"></td>
                     <td>
+                        <div th:if="${p.libro.pdfUrl != null and p.libro.pdfUrl != ''}" class="mb-2">
+                            <a th:href="@{'/leer-pdf?id=' + ${p.libro.id}}" target="_blank" class="btn btn-sm btn-info">Leer PDF</a>
+                        </div>
                         <form th:if="${p.estado == 'ACTIVO'}" th:action="@{'/mis-prestamos/' + ${p.id} + '/solicitar-devolucion'}" method="post" class="m-0">
                             <button class="btn btn-sm btn-outline-primary" type="submit">Solicitar devolucion</button>
                         </form>
-                        <span th:if="${p.estado != 'ACTIVO'}" class="muted">-</span>
+                        <span th:if="${p.estado != 'ACTIVO' and (p.libro.pdfUrl == null or p.libro.pdfUrl == '')}" class="muted">-</span>
                     </td>
                 </tr>
                 </tbody>
             </table>
+            <section class="surface p-3 mt-4">
+                <h2 class="h5 mb-3">Libros Virtuales para Leer Gratis</h2>
+                <p class="muted mb-3">Disfruta de estos libros en formato PDF sin necesidad de préstamo.</p>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                        <tr><th>Título</th><th>Autor</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="l : ${librosVirtualesGratis}">
+                            <td th:text="${l.titulo}"></td>
+                            <td th:text="${l.autor}"></td>
+                            <td class="action-group">
+                                <a th:href="@{'/leer-pdf?id=' + ${l.id}}" target="_blank" class="btn btn-sm btn-outline-success">Leer PDF</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${librosVirtualesGratis.isEmpty()}">
+                            <td colspan="3">No hay libros virtuales disponibles para leer gratis.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
     </section>
 </main>

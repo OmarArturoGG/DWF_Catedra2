@@ -24,15 +24,16 @@
                 </thead>
                 <tbody>
                 <tr th:each="l : ${libros}">
-                    <td th:text="${l.titulo}"></td>
+                    <td><a th:href="@{'/detalles-libro?id=' + ${l.id}}" th:text="${l.titulo}"></a></td>
                     <td th:text="${l.autor}"></td>
                     <td th:text="${l.tipo}"></td>
                     <td th:text="${l.disponible} ? 'Disponible' : 'No disponible'"></td>
                     <td class="action-group">
-                        <form th:if="${l.disponible}" th:action="@{'/catalogo/prestar/' + ${l.id}}" method="post" class="m-0">
+                        <form th:if="${l.tipo == 'FISICO' and l.disponible}" th:action="@{'/catalogo/prestar/' + ${l.id}}" method="post" class="m-0">
                             <button class="btn btn-sm btn-outline-primary" type="submit">Prestar</button>
                         </form>
-                        <button th:if="${!l.disponible}" class="btn btn-sm btn-secondary" type="button" disabled>No disponible</button>
+                        <a th:if="${l.tipo == 'VIRTUAL' and l.pdfUrl != null and l.disponible}" th:href="@{'/leer-pdf?id=' + ${l.id}}" target="_blank" class="btn btn-sm btn-outline-success">Leer PDF</a>
+                        <button th:if="${!l.disponible and l.tipo == 'FISICO'}" class="btn btn-sm btn-secondary" type="button" disabled>No disponible</button>
                         <form th:action="@{'/catalogo/deseos/' + ${l.id}}" method="post" class="m-0">
                             <button class="btn btn-sm btn-outline-secondary" type="submit">Lista deseos</button>
                         </form>

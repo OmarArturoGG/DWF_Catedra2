@@ -1,10 +1,12 @@
 package sv.edu.udb.config;
 
-import sv.edu.udb.entity.Libro;
-import sv.edu.udb.repository.libroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import sv.edu.udb.entity.Libro;
+import sv.edu.udb.repository.libroRepository;
+import sv.edu.udb.service.usuarioService; // Added import for usuarioService
+
 import java.time.LocalDate;
 
 @Component
@@ -13,12 +15,26 @@ public class cargarDatos implements CommandLineRunner {
     @Autowired
     private libroRepository libroRepository;
 
+    @Autowired
+    private usuarioService usuarioService; // Autowired usuarioService
+
     @Override
     public void run(String... args) throws Exception {
 
+        // Check and create default users
+        if (usuarioService.buscarPorEmail("admin@biblioteca.com").isEmpty()) {
+            usuarioService.registrarUsuario("Admin", "admin@biblioteca.com", "admin123", "ADMIN");
+            System.out.println("=== Admin user created: admin@biblioteca.com / admin123 ===");
+        }
+
+        if (usuarioService.buscarPorEmail("user@biblioteca.com").isEmpty()) {
+            usuarioService.registrarUsuario("User", "user@biblioteca.com", "user123", "VOLUNTARIO"); // Using "VOLUNTARIO" for the role
+            System.out.println("=== Normal user created: user@biblioteca.com / user123 ===");
+        }
+
+
         if (libroRepository.count() == 0) {
-
-
+            // Initial books
             Libro libro1 = new Libro();
             libro1.setTitulo("Cien años de soledad");
             libro1.setAutor("Gabriel García Márquez");
@@ -37,48 +53,58 @@ public class cargarDatos implements CommandLineRunner {
             libro2.setDisponible(true);
             libroRepository.save(libro2);
 
+            // Virtual Book 1: Don Quijote
             Libro libro3 = new Libro();
-            libro3.setTitulo("La sombra del viento");
-            libro3.setAutor("Carlos Ruiz Zafón");
-            libro3.setFechaPublicacion(LocalDate.of(2001, 4, 15));
-            libro3.setPortadaUrl("https://covers.openlibrary.org/b/id/12525346-L.jpg");
-            libro3.setTipo("FISICO");
+            libro3.setTitulo("Don Quijote de la Mancha");
+            libro3.setAutor("Miguel de Cervantes Saavedra");
+            libro3.setFechaPublicacion(LocalDate.of(1605, 1, 16));
+            libro3.setPortadaUrl("https://covers.openlibrary.org/b/id/8269780-L.jpg");
+            libro3.setTipo("VIRTUAL");
+            libro3.setPdfUrl("static/pdfs/Don-Quijote.pdf"); // URL del PDF
             libro3.setDisponible(true);
             libroRepository.save(libro3);
 
+            // Virtual Book 2: El fabricante de ataúdes
             Libro libro4 = new Libro();
-            libro4.setTitulo("El juego del ángel");
-            libro4.setAutor("Carlos Ruiz Zafón");
-            libro4.setFechaPublicacion(LocalDate.of(2008, 4, 15));
-            libro4.setPortadaUrl("https://covers.openlibrary.org/b/id/12525347-L.jpg");
-            libro4.setTipo("FISICO");
+            libro4.setTitulo("El fabricante de ataúdes");
+            libro4.setAutor("Alexander Pushkin");
+            libro4.setFechaPublicacion(LocalDate.of(1831, 1, 1));
+            libro4.setPortadaUrl("https://covers.openlibrary.org/b/id/10499710-L.jpg");
+            libro4.setTipo("VIRTUAL");
+            libro4.setPdfUrl("/pdfs/El_fabricante_de_ataudes.pdf"); // URL del PDF
             libro4.setDisponible(true);
             libroRepository.save(libro4);
 
+            // Virtual Book 3: El fantasma de Canterville
             Libro libro5 = new Libro();
-            libro5.setTitulo("La casa de los espíritus");
-            libro5.setAutor("Isabel Allende");
-            libro5.setFechaPublicacion(LocalDate.of(1982, 1, 1));
-            libro5.setPortadaUrl("https://covers.openlibrary.org/b/id/12525348-L.jpg");
-            libro5.setTipo("FISICO");
+            libro5.setTitulo("El fantasma de Canterville");
+            libro5.setAutor("Oscar Wilde");
+            libro5.setFechaPublicacion(LocalDate.of(1887, 1, 1));
+            libro5.setPortadaUrl("https://covers.openlibrary.org/b/id/8816401-L.jpg");
+            libro5.setTipo("VIRTUAL");
+            libro5.setPdfUrl("/pdfs/El_fantasma_de_Canterville.pdf"); // URL del PDF
             libro5.setDisponible(true);
             libroRepository.save(libro5);
 
+            // Virtual Book 4: El jugador
             Libro libro6 = new Libro();
-            libro6.setTitulo("Como agua para chocolate");
-            libro6.setAutor("Laura Esquivel");
-            libro6.setFechaPublicacion(LocalDate.of(1989, 1, 1));
-            libro6.setPortadaUrl("https://covers.openlibrary.org/b/id/12525349-L.jpg");
-            libro6.setTipo("FISICO");
+            libro6.setTitulo("El jugador");
+            libro6.setAutor("Fyodor Dostoevsky");
+            libro6.setFechaPublicacion(LocalDate.of(1866, 1, 1));
+            libro6.setPortadaUrl("https://covers.openlibrary.org/b/id/10008892-L.jpg");
+            libro6.setTipo("VIRTUAL");
+            libro6.setPdfUrl("/pdfs/El_jugador.pdf"); // URL del PDF
             libro6.setDisponible(true);
             libroRepository.save(libro6);
 
+            // Virtual Book 5: El principito
             Libro libro7 = new Libro();
-            libro7.setTitulo("Rayuela");
-            libro7.setAutor("Julio Cortázar");
-            libro7.setFechaPublicacion(LocalDate.of(1963, 6, 28));
-            libro7.setPortadaUrl("https://covers.openlibrary.org/b/id/12525350-L.jpg");
-            libro7.setTipo("FISICO");
+            libro7.setTitulo("El principito");
+            libro7.setAutor("Antoine de Saint-Exupéry");
+            libro7.setFechaPublicacion(LocalDate.of(1943, 4, 6));
+            libro7.setPortadaUrl("https://covers.openlibrary.org/b/id/10667083-L.jpg");
+            libro7.setTipo("VIRTUAL");
+            libro7.setPdfUrl("/pdfs/El_principito.pdf"); // URL del PDF
             libro7.setDisponible(true);
             libroRepository.save(libro7);
 

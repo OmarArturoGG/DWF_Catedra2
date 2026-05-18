@@ -10,4 +10,5 @@ import java.util.List;
 public interface libroRepository extends JpaRepository<Libro, Long> {
     List<Libro> findByDisponibleTrue();
     List<Libro> findByTipo(String tipo);
+    List<Libro> findByTipoAndPdfUrlIsNotNullAndDisponibleTrue(String tipo);
 }

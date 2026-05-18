@@ -337,6 +337,7 @@ public class vistaController {
         model.addAttribute("usuarioNombre", session.getAttribute("usuarioNombre"));
         model.addAttribute("usuarioRol", session.getAttribute("usuarioRol"));
         model.addAttribute("prestamos", prestamoService.listarTodosLosPrestamosPorUsuario(usuario));
+        model.addAttribute("librosVirtualesGratis", libroService.listarLibrosVirtualesDisponiblesConPdf());
         return "mis-prestamos";
     }
 

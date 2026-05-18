@@ -21,9 +21,3 @@ SELECT 'Alfaguara'
     WHERE NOT EXISTS (
     SELECT 1 FROM editoriales WHERE nombre = 'Alfaguara'
 );
-
-INSERT INTO usuarios (nombre, email, password, fecha_registro, rol)
-SELECT 'Admin', 'admin@biblioteca.com', 'admin123', NOW(), 'admin'
-    WHERE NOT EXISTS (
-    SELECT 1 FROM usuarios WHERE email = 'admin@biblioteca.com'
-);

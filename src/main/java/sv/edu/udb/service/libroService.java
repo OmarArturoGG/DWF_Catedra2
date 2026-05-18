@@ -112,5 +112,10 @@ public class libroService {
         libro.setPdfUrl(request.getPdfUrl());
         libro.setDisponible(request.getDisponible());
         return libro;
+
     }
+    public List<Libro> listarLibrosVirtualesDisponiblesConPdf() {
+        return libroRepository.findByTipoAndPdfUrlIsNotNullAndDisponibleTrue("VIRTUAL");
+    }
+
 }
