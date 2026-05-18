@@ -53,6 +53,7 @@ public class libroService {
         libro.setTitulo(payload.getTitulo());
         libro.setAutor(payload.getAutor());
         libro.setPortadaUrl(payload.getPortadaUrl());
+        libro.setFechaPublicacion(payload.getFechaPublicacion());
         libro.setTipo(payload.getTipo());
         libro.setDescripcion(payload.getDescripcion());
         libro.setIsbn(payload.getIsbn());
@@ -102,6 +103,7 @@ public class libroService {
         libro.setAutor(request.getAutor());
         libro.setTipo(request.getTipo());
         libro.setPortadaUrl(request.getPortadaUrl());
+        libro.setFechaPublicacion(request.getFechaPublicacion());
         libro.setDescripcion(request.getDescripcion());
         libro.setIsbn(request.getIsbn());
         libro.setEditorial(request.getEditorial());

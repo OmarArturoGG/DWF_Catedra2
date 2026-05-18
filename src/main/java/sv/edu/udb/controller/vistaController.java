@@ -24,6 +24,7 @@ import sv.edu.udb.service.libroService;
 import sv.edu.udb.service.listaDeseosService;
 import sv.edu.udb.service.prestamoService;
 import sv.edu.udb.service.usuarioService;
+import java.time.LocalDate;
 
 @Controller
 public class vistaController {
@@ -152,6 +153,7 @@ public class vistaController {
         model.addAttribute("libros", libroService.listarTodosLosLibros());
         model.addAttribute("autores", autorService.listarTodos());
         model.addAttribute("editoriales", editorialService.listarTodos());
+        model.addAttribute("prestamos", prestamoService.listarTodos());
         if (editLibroId != null) {
             model.addAttribute("libroEdit", libroService.obtenerPorId(editLibroId));
         }
@@ -168,20 +170,46 @@ public class vistaController {
     public String actualizarLibro(@RequestParam Long id,
                                   @RequestParam String titulo,
                                   @RequestParam String autor,
+                                  @RequestParam(required = false) String fechaPublicacion,
+                                  @RequestParam(required = false) String portadaUrl,
                                   @RequestParam String tipo,
+                                  @RequestParam(required = false) String descripcion,
+                                  @RequestParam(required = false) String isbn,
+                                  @RequestParam(required = false) String editorial,
+                                  @RequestParam(required = false) String previewLink,
+                                  @RequestParam(required = false) String pdfUrl,
                                   @RequestParam(required = false) Integer paginas,
                                   @RequestParam(defaultValue = "false") boolean disponible,
                                   RedirectAttributes ra) {
         try {
-            LibroRequest req = new LibroRequest();
-            req.setTitulo(titulo);
-            req.setAutor(autor);
-            req.setTipo(tipo);
-            req.setPaginas(paginas);
-            req.setDisponible(disponible);
+            LibroRequest req = buildLibroRequest(titulo, autor, fechaPublicacion, portadaUrl, tipo, descripcion, isbn, editorial, previewLink, pdfUrl, paginas, disponible);
             libroService.actualizarLibro(id, req);
             ra.addFlashAttribute("ok", "Material actualizado");
         } catch (BusinessException | ResourceNotFoundException ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/admin/libros/crear")
+    public String crearLibro(@RequestParam String titulo,
+                             @RequestParam String autor,
+                             @RequestParam(required = false) String fechaPublicacion,
+                             @RequestParam(required = false) String portadaUrl,
+                             @RequestParam String tipo,
+                             @RequestParam(required = false) String descripcion,
+                             @RequestParam(required = false) String isbn,
+                             @RequestParam(required = false) String editorial,
+                             @RequestParam(required = false) String previewLink,
+                             @RequestParam(required = false) String pdfUrl,
+                             @RequestParam(required = false) Integer paginas,
+                             @RequestParam(defaultValue = "true") boolean disponible,
+                             RedirectAttributes ra) {
+        try {
+            LibroRequest req = buildLibroRequest(titulo, autor, fechaPublicacion, portadaUrl, tipo, descripcion, isbn, editorial, previewLink, pdfUrl, paginas, disponible);
+            libroService.guardarLibro(req);
+            ra.addFlashAttribute("ok", "Material creado");
+        } catch (BusinessException ex) {
             ra.addFlashAttribute("error", ex.getMessage());
         }
         return "redirect:/admin";
@@ -274,12 +302,12 @@ public class vistaController {
             Long usuarioId = (Long) session.getAttribute("usuarioId");
             Usuario usuario = usuarioService.obtenerPorId(usuarioId);
             Libro libro = libroService.obtenerPorId(libroId);
-            prestamoService.prestarLibro(usuario, libro, 15);
-            ra.addFlashAttribute("ok", "Prestamo realizado");
+            prestamoService.solicitarPrestamo(usuario, libro, 15);
+            ra.addFlashAttribute("ok", "Solicitud enviada. Queda en espera de aprobacion del admin.");
         } catch (BusinessException | ResourceNotFoundException ex) {
             ra.addFlashAttribute("error", ex.getMessage());
         }
-        return "redirect:/catalogo";
+        return "redirect:/usuario";
     }
 
     @PostMapping("/catalogo/deseos/{libroId}")
@@ -296,7 +324,7 @@ public class vistaController {
         } catch (BusinessException | DuplicateResourceException | ResourceNotFoundException ex) {
             ra.addFlashAttribute("error", ex.getMessage());
         }
-        return "redirect:/catalogo";
+        return "redirect:/usuario";
     }
 
     @GetMapping("/mis-prestamos")
@@ -310,6 +338,62 @@ public class vistaController {
         model.addAttribute("usuarioRol", session.getAttribute("usuarioRol"));
         model.addAttribute("prestamos", prestamoService.listarTodosLosPrestamosPorUsuario(usuario));
         return "mis-prestamos";
+    }
+
+    @PostMapping("/mis-prestamos/{prestamoId}/solicitar-devolucion")
+    public String solicitarDevolucion(@PathVariable Long prestamoId, HttpSession session, RedirectAttributes ra) {
+        if (!isLogged(session)) {
+            return "redirect:/login";
+        }
+        try {
+            prestamoService.solicitarDevolucion(prestamoId);
+            ra.addFlashAttribute("ok", "Solicitud de devolucion enviada al administrador.");
+        } catch (BusinessException | ResourceNotFoundException ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/mis-prestamos";
+    }
+
+    @PostMapping("/admin/prestamos/{prestamoId}/aprobar")
+    public String aprobarPrestamoAdmin(@PathVariable Long prestamoId, HttpSession session, RedirectAttributes ra) {
+        if (!isLogged(session) || !isAdmin(session)) {
+            return "redirect:/login";
+        }
+        try {
+            prestamoService.aprobarPrestamo(prestamoId);
+            ra.addFlashAttribute("ok", "Prestamo aprobado.");
+        } catch (BusinessException | ResourceNotFoundException ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/admin/prestamos/{prestamoId}/rechazar")
+    public String rechazarPrestamoAdmin(@PathVariable Long prestamoId, HttpSession session, RedirectAttributes ra) {
+        if (!isLogged(session) || !isAdmin(session)) {
+            return "redirect:/login";
+        }
+        try {
+            prestamoService.rechazarPrestamo(prestamoId);
+            ra.addFlashAttribute("ok", "Prestamo rechazado.");
+        } catch (BusinessException | ResourceNotFoundException ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/admin/prestamos/{prestamoId}/confirmar-devolucion")
+    public String confirmarDevolucionAdmin(@PathVariable Long prestamoId, HttpSession session, RedirectAttributes ra) {
+        if (!isLogged(session) || !isAdmin(session)) {
+            return "redirect:/login";
+        }
+        try {
+            prestamoService.confirmarDevolucionAdmin(prestamoId);
+            ra.addFlashAttribute("ok", "Devolucion confirmada.");
+        } catch (BusinessException | ResourceNotFoundException ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/admin";
     }
 
     @PostMapping("/mi-cuenta/lista-deseos/{libroId}/eliminar")
@@ -336,5 +420,35 @@ public class vistaController {
     private boolean isAdmin(HttpSession session) {
         Object rol = session.getAttribute("usuarioRol");
         return rol != null && "ADMIN".equalsIgnoreCase(rol.toString());
+    }
+
+    private LibroRequest buildLibroRequest(String titulo,
+                                           String autor,
+                                           String fechaPublicacion,
+                                           String portadaUrl,
+                                           String tipo,
+                                           String descripcion,
+                                           String isbn,
+                                           String editorial,
+                                           String previewLink,
+                                           String pdfUrl,
+                                           Integer paginas,
+                                           boolean disponible) {
+        LibroRequest req = new LibroRequest();
+        req.setTitulo(titulo);
+        req.setAutor(autor);
+        req.setTipo(tipo);
+        req.setPortadaUrl(portadaUrl);
+        req.setDescripcion(descripcion);
+        req.setIsbn(isbn);
+        req.setEditorial(editorial);
+        req.setPreviewLink(previewLink);
+        req.setPdfUrl(pdfUrl);
+        req.setPaginas(paginas);
+        req.setDisponible(disponible);
+        if (fechaPublicacion != null && !fechaPublicacion.isBlank()) {
+            req.setFechaPublicacion(LocalDate.parse(fechaPublicacion));
+        }
+        return req;
     }
 }

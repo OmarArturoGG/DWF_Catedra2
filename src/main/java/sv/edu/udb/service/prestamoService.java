@@ -57,6 +57,72 @@ public class prestamoService {
         return prestamoRepository.save(prestamo);
     }
 
+    public Prestamo solicitarPrestamo(Usuario usuario, Libro libro, int diasPrestamo) {
+        if (usuario == null) {
+            throw new BusinessException("El usuario no existe");
+        }
+        if (libro == null) {
+            throw new BusinessException("El libro no existe");
+        }
+        if (diasPrestamo <= 0) {
+            throw new BusinessException("Los dias de prestamo son invalidos");
+        }
+        Prestamo prestamo = new Prestamo();
+        prestamo.setUsuario(usuario);
+        prestamo.setLibro(libro);
+        prestamo.setFechaPrestamo(LocalDateTime.now());
+        prestamo.setFechaLimite(LocalDateTime.now().plusDays(diasPrestamo));
+        prestamo.setEstado("EN_ESPERA");
+        return prestamoRepository.save(prestamo);
+    }
+
+    public Prestamo aprobarPrestamo(Long prestamoId) {
+        Prestamo prestamo = obtenerPorId(prestamoId);
+        if (!"EN_ESPERA".equalsIgnoreCase(prestamo.getEstado())) {
+            throw new BusinessException("Solo se pueden aprobar prestamos en espera");
+        }
+        Libro libro = prestamo.getLibro();
+        if (!Boolean.TRUE.equals(libro.getDisponible())) {
+            throw new BusinessException("El libro no esta disponible para aprobar este prestamo");
+        }
+        prestamo.setEstado("ACTIVO");
+        prestamo.setFechaPrestamo(LocalDateTime.now());
+        prestamo.setFechaLimite(LocalDateTime.now().plusDays(15));
+        libro.setDisponible(false);
+        libroRepository.save(libro);
+        return prestamoRepository.save(prestamo);
+    }
+
+    public Prestamo rechazarPrestamo(Long prestamoId) {
+        Prestamo prestamo = obtenerPorId(prestamoId);
+        if (!"EN_ESPERA".equalsIgnoreCase(prestamo.getEstado())) {
+            throw new BusinessException("Solo se pueden rechazar prestamos en espera");
+        }
+        prestamo.setEstado("RECHAZADO");
+        return prestamoRepository.save(prestamo);
+    }
+
+    public Prestamo solicitarDevolucion(Long prestamoId) {
+        Prestamo prestamo = obtenerPorId(prestamoId);
+        if (!"ACTIVO".equalsIgnoreCase(prestamo.getEstado())) {
+            throw new BusinessException("Solo los prestamos activos pueden solicitar devolucion");
+        }
+        prestamo.setEstado("DEVOLUCION_EN_ESPERA");
+        return prestamoRepository.save(prestamo);
+    }
+
+    public Prestamo confirmarDevolucionAdmin(Long prestamoId) {
+        Prestamo prestamo = obtenerPorId(prestamoId);
+        if (!"DEVOLUCION_EN_ESPERA".equalsIgnoreCase(prestamo.getEstado())) {
+            throw new BusinessException("Solo se puede confirmar devolucion en estado de espera");
+        }
+        prestamo.setEstado("DEVUELTO");
+        Libro libro = prestamo.getLibro();
+        libro.setDisponible(true);
+        libroRepository.save(libro);
+        return prestamoRepository.save(prestamo);
+    }
+
     public Prestamo actualizarDiasPrestamo(Long prestamoId, int diasExtra) {
         if (diasExtra == 0) {
             throw new BusinessException("La modificación de días no puede ser cero");
