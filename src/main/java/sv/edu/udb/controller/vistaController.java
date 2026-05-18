@@ -51,6 +51,11 @@ public class vistaController {
         return "mi-cuenta";
     }
 
+    @GetMapping("/admin")
+    public String admin() {
+        return "admin";
+    }
+
 
     @GetMapping("/buscar-virtuales")
     public String buscarVirtuales() {
