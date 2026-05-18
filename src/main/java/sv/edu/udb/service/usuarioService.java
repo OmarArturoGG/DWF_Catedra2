@@ -1,6 +1,7 @@
 package sv.edu.udb.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import sv.edu.udb.entity.Usuario;
 import sv.edu.udb.exception.BusinessException;
@@ -18,35 +19,42 @@ public class usuarioService {
     @Autowired
     private usuarioRepository usuarioRepository;
 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     public List<Usuario> listarTodos() {
         return usuarioRepository.findAll();
     }
 
     public Usuario registrarUsuario(String nombre, String email, String password) {
+        return registrarUsuario(nombre, email, password, "USER");
+    }
+
+    public Usuario registrarUsuario(String nombre, String email, String password, String rol) {
         if (nombre == null || nombre.trim().isEmpty()) {
-            throw new BusinessException("El nombre está vacío");
+            throw new BusinessException("El nombre esta vacio");
         }
         if (email == null || email.trim().isEmpty()) {
-            throw new BusinessException("El correo está vacío");
+            throw new BusinessException("El correo esta vacio");
         }
         if (!email.contains("@") || !email.contains(".")) {
-            throw new BusinessException("Correo inválido");
+            throw new BusinessException("Correo invalido");
         }
         if (password == null || password.trim().isEmpty()) {
-            throw new BusinessException("La contraseña está vacía");
+            throw new BusinessException("La contrasena esta vacia");
         }
         if (password.length() < 6) {
-            throw new BusinessException("La contraseña debe tener mínimo 6 caracteres");
+            throw new BusinessException("La contrasena debe tener minimo 6 caracteres");
         }
         Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(email);
         if (usuarioExistente.isPresent()) {
-            throw new DuplicateResourceException("El correo ya está registrado");
+            throw new DuplicateResourceException("El correo ya esta registrado");
         }
         Usuario usuario = new Usuario();
         usuario.setNombre(nombre);
         usuario.setEmail(email);
-        usuario.setPassword(password);
+        usuario.setPassword(passwordEncoder.encode(password));
         usuario.setFechaRegistro(LocalDateTime.now());
+        usuario.setRol(("ADMIN".equalsIgnoreCase(rol)) ? "ADMIN" : "USER");
         return usuarioRepository.save(usuario);
     }
 
@@ -65,7 +73,7 @@ public class usuarioService {
 
     public boolean validarLogin(String email, String password) {
         return usuarioRepository.findByEmail(email)
-                .map(user -> user.getPassword().equals(password))
+                .map(user -> passwordEncoder.matches(password, user.getPassword()))
                 .orElse(false);
     }
 
@@ -77,15 +85,15 @@ public class usuarioService {
         if (payload.getEmail() != null && !payload.getEmail().trim().isEmpty()) {
             Optional<Usuario> maybe = usuarioRepository.findByEmail(payload.getEmail());
             if (maybe.isPresent() && !maybe.get().getId().equals(id)) {
-                throw new DuplicateResourceException("El correo ya está registrado");
+                throw new DuplicateResourceException("El correo ya esta registrado");
             }
             usuario.setEmail(payload.getEmail());
         }
         if (payload.getPassword() != null && !payload.getPassword().trim().isEmpty()) {
             if (payload.getPassword().length() < 6) {
-                throw new BusinessException("La contraseña debe tener mínimo 6 caracteres");
+                throw new BusinessException("La contrasena debe tener minimo 6 caracteres");
             }
-            usuario.setPassword(payload.getPassword());
+            usuario.setPassword(passwordEncoder.encode(payload.getPassword()));
         }
         return usuarioRepository.save(usuario);
     }
