@@ -3,7 +3,10 @@ package sv.edu.udb.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import sv.edu.udb.dto.ActualizarDiasPrestamoRequest;
+import sv.edu.udb.dto.PrestamoRequest;
 import sv.edu.udb.entity.Libro;
 import sv.edu.udb.entity.Prestamo;
 import sv.edu.udb.entity.Usuario;
@@ -37,12 +40,10 @@ public class prestamoController {
     }
 
     @PostMapping
-    public ResponseEntity<Prestamo> prestarLibro(@RequestParam Long usuarioId,
-                                                 @RequestParam Long libroId,
-                                                 @RequestParam int diasPrestamo) {
-        Usuario usuario = usuarioService.obtenerPorId(usuarioId);
-        Libro libro = libroService.obtenerPorId(libroId);
-        Prestamo prestamo = prestamoService.prestarLibro(usuario, libro, diasPrestamo);
+    public ResponseEntity<Prestamo> prestarLibro(@Valid @RequestBody PrestamoRequest request) {
+        Usuario usuario = usuarioService.obtenerPorId(request.getUsuarioId());
+        Libro libro = libroService.obtenerPorId(request.getLibroId());
+        Prestamo prestamo = prestamoService.prestarLibro(usuario, libro, request.getDiasPrestamo());
         return ResponseEntity.status(HttpStatus.CREATED).body(prestamo);
     }
 
@@ -54,6 +55,12 @@ public class prestamoController {
     @PutMapping("/{id}/dias")
     public ResponseEntity<Prestamo> actualizarDias(@PathVariable Long id, @RequestParam int dias) {
         return ResponseEntity.ok(prestamoService.actualizarDiasPrestamo(id, dias));
+    }
+
+    @PutMapping("/{id}/condiciones")
+    public ResponseEntity<Prestamo> actualizarCondicionesPrestamo(@PathVariable Long id,
+                                                                  @Valid @RequestBody ActualizarDiasPrestamoRequest request) {
+        return ResponseEntity.ok(prestamoService.actualizarDiasPermitidos(id, request.getDiasPermitidos()));
     }
 
     @PutMapping("/{id}/devolver")

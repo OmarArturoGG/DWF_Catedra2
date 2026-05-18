@@ -2,6 +2,7 @@ package sv.edu.udb.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sv.edu.udb.dto.LibroRequest;
 import sv.edu.udb.entity.Libro;
 import sv.edu.udb.exception.BusinessException;
 import sv.edu.udb.exception.ResourceNotFoundException;
@@ -37,19 +38,20 @@ public class libroService {
                 .orElseThrow(() -> new ResourceNotFoundException("Libro no encontrado con id " + id));
     }
 
-    public Libro guardarLibro(Libro libro) {
-        validarLibro(libro);
+    public Libro guardarLibro(LibroRequest request) {
+        validarLibroRequest(request);
+        Libro libro = mapToEntity(request);
         if (libro.getDisponible() == null) {
             libro.setDisponible(true);
         }
         return libroRepository.save(libro);
     }
 
-    public Libro actualizarLibro(Long id, Libro payload) {
+    public Libro actualizarLibro(Long id, LibroRequest payload) {
+        validarLibroRequest(payload);
         Libro libro = obtenerPorId(id);
         libro.setTitulo(payload.getTitulo());
         libro.setAutor(payload.getAutor());
-        libro.setFechaPublicacion(payload.getFechaPublicacion());
         libro.setPortadaUrl(payload.getPortadaUrl());
         libro.setTipo(payload.getTipo());
         libro.setDescripcion(payload.getDescripcion());
@@ -61,7 +63,7 @@ public class libroService {
         if (payload.getDisponible() != null) {
             libro.setDisponible(payload.getDisponible());
         }
-        validarLibro(libro);
+        validarLibroEntity(libro);
         return libroRepository.save(libro);
     }
 
@@ -70,15 +72,43 @@ public class libroService {
         libroRepository.delete(libro);
     }
 
-    private void validarLibro(Libro libro) {
+    private void validarLibroRequest(LibroRequest request) {
+        if (request.getTipo() == null || request.getTipo().trim().isEmpty()) {
+            throw new BusinessException("El tipo de libro esta vacio");
+        }
+        if (request.getPaginas() != null && request.getPaginas() < 0) {
+            throw new BusinessException("Las paginas no pueden ser negativas");
+        }
+    }
+
+    private void validarLibroEntity(Libro libro) {
         if (libro.getTitulo() == null || libro.getTitulo().trim().isEmpty()) {
-            throw new BusinessException("El título del libro está vacío");
+            throw new BusinessException("El titulo del libro esta vacio");
         }
         if (libro.getAutor() == null || libro.getAutor().trim().isEmpty()) {
-            throw new BusinessException("El autor está vacío");
+            throw new BusinessException("El autor esta vacio");
         }
         if (libro.getTipo() == null || libro.getTipo().trim().isEmpty()) {
-            throw new BusinessException("El tipo de libro está vacío");
+            throw new BusinessException("El tipo de libro esta vacio");
         }
+        if (libro.getPaginas() != null && libro.getPaginas() < 0) {
+            throw new BusinessException("Las paginas no pueden ser negativas");
+        }
+    }
+
+    private Libro mapToEntity(LibroRequest request) {
+        Libro libro = new Libro();
+        libro.setTitulo(request.getTitulo());
+        libro.setAutor(request.getAutor());
+        libro.setTipo(request.getTipo());
+        libro.setPortadaUrl(request.getPortadaUrl());
+        libro.setDescripcion(request.getDescripcion());
+        libro.setIsbn(request.getIsbn());
+        libro.setEditorial(request.getEditorial());
+        libro.setPreviewLink(request.getPreviewLink());
+        libro.setPaginas(request.getPaginas());
+        libro.setPdfUrl(request.getPdfUrl());
+        libro.setDisponible(request.getDisponible());
+        return libro;
     }
 }

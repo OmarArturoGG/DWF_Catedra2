@@ -3,7 +3,9 @@ package sv.edu.udb.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import sv.edu.udb.dto.LibroRequest;
 import sv.edu.udb.entity.Libro;
 import sv.edu.udb.service.libroService;
 
@@ -32,12 +34,12 @@ public class libroController {
     }
 
     @PostMapping
-    public ResponseEntity<Libro> crear(@RequestBody Libro libro) {
+    public ResponseEntity<Libro> crear(@Valid @RequestBody LibroRequest libro) {
         return ResponseEntity.status(HttpStatus.CREATED).body(libroService.guardarLibro(libro));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Libro> actualizar(@PathVariable Long id, @RequestBody Libro libro) {
+    public ResponseEntity<Libro> actualizar(@PathVariable Long id, @Valid @RequestBody LibroRequest libro) {
         return ResponseEntity.ok(libroService.actualizarLibro(id, libro));
     }
 

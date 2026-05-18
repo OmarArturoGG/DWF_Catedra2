@@ -73,6 +73,18 @@ public class prestamoService {
         return prestamoRepository.save(prestamo);
     }
 
+    public Prestamo actualizarDiasPermitidos(Long prestamoId, int diasPermitidos) {
+        Prestamo prestamo = obtenerPorId(prestamoId);
+        if (!"ACTIVO".equalsIgnoreCase(prestamo.getEstado())) {
+            throw new BusinessException("Solo se pueden modificar dias en prestamos activos");
+        }
+        if (diasPermitidos <= 0) {
+            throw new BusinessException("Los dias permitidos deben ser mayores a cero");
+        }
+        prestamo.setFechaLimite(prestamo.getFechaPrestamo().plusDays(diasPermitidos));
+        return prestamoRepository.save(prestamo);
+    }
+
     public Prestamo devolverLibro(Long prestamoId) {
         Prestamo prestamo = obtenerPorId(prestamoId);
         if (!"ACTIVO".equalsIgnoreCase(prestamo.getEstado())) {

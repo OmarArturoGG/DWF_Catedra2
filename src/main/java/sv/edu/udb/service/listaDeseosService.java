@@ -48,7 +48,9 @@ public class listaDeseosService {
     }
 
     public void eliminarLibroDeUsuario(Usuario usuario, Libro libro) {
-        listaDeseosRepository.deleteByUsuarioAndLibro(usuario, libro);
+        ListaDeseos item = listaDeseosRepository.findByUsuarioAndLibro(usuario, libro)
+                .orElseThrow(() -> new ResourceNotFoundException("El libro no existe en la lista de deseos del usuario"));
+        listaDeseosRepository.delete(item);
     }
 
     public void limpiarListaUsuario(Usuario usuario) {

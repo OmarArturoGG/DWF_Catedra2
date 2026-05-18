@@ -12,6 +12,7 @@ import java.util.List;
 public interface listaDeseosRepository extends JpaRepository<ListaDeseos, Long> {
     List<ListaDeseos> findByUsuario(Usuario usuario);
     boolean existsByUsuarioAndLibro(Usuario usuario, Libro libro);
+    java.util.Optional<ListaDeseos> findByUsuarioAndLibro(Usuario usuario, Libro libro);
     void deleteByUsuarioAndLibro(Usuario usuario, Libro libro);
     void deleteByUsuario(Usuario usuario);
 }
