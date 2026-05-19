@@ -42,17 +42,14 @@
   <table style={margin: 0 auto}>
   <tr align="center">
    <td>Omar Maldonado</td>
-    <td>Nose</td>
-    <td>Nose</td>
-    <td>Nose</td>
-    <td>nose</td>
+    <td>Francisco Andres</td>
+    <td>Angel Mauricio</td>
       </tr>
     <tr align="center">
     <td> <br><picture><img src = "https://emojis.slackmojis.com/emojis/images/1531849430/4246/blob-sunglasses.gif?1531849430" width = 50px></picture> </td>
     <td> <br><picture><img src = "https://emojis.slackmojis.com/emojis/images/1531849430/4246/blob-sunglasses.gif?1531849430" width = 50px></picture> </td>
     <td> <br><picture><img src = "https://emojis.slackmojis.com/emojis/images/1531849430/4246/blob-sunglasses.gif?1531849430" width = 50px></picture> </td>
-    <td> <br><picture><img src = "https://emojis.slackmojis.com/emojis/images/1531849430/4246/blob-sunglasses.gif?1531849430" width = 50px></picture> </td>
-    <td> <br><picture><img src = "https://emojis.slackmojis.com/emojis/images/1531849430/4246/blob-sunglasses.gif?1531849430" width = 50px></picture> </td>
+  
  </tr>
 </table>
-</div>
+</div> </div>
