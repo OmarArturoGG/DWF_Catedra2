@@ -1,0 +1,109 @@
+:root {
+    --bg: #e9edf3;
+    --card: #fdfdfd;
+    --text: #1d2a44;
+    --muted: #66748e;
+    --primary: #b7ad37;
+    --danger: #d94747;
+    --border: #cfd6e3;
+    --nav-bg: #f3f4f6;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+.app-shell {
+    max-width: 1200px;
+}
+
+.surface {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(19, 35, 71, 0.04);
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+.action-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.wishlist-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem;
+    background: #fff;
+}
+
+.login-card {
+    max-width: 430px;
+}
+
+.navbar {
+    background: var(--nav-bg) !important;
+}
+
+.navbar-brand {
+    font-weight: 700;
+}
+
+.nav-link {
+    color: #3a4660;
+}
+
+.nav-link:hover {
+    color: #1d2a44;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border-color: #a39828;
+    color: #1e1f16;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: #a89f31;
+    border-color: #978f24;
+    color: #171812;
+}
+
+.btn-outline-primary {
+    border-color: #2c6cf5;
+    color: #2c6cf5;
+}
+
+.btn-outline-primary:hover {
+    background: #2c6cf5;
+    color: #fff;
+}
+
+.btn-outline-danger {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.btn-outline-danger:hover {
+    background: var(--danger);
+    color: #fff;
+}
+
+.table > :not(caption) > * > * {
+    border-color: #d6dce7;
+}
